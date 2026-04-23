@@ -17,6 +17,8 @@ repositories {
 	mavenCentral()
 }
 
+val jjwt = "0.13.0"
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-h2console")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -27,7 +29,10 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
+	implementation("io.jsonwebtoken:jjwt-api:$jjwt")
 	compileOnly("org.projectlombok:lombok")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:$jjwt")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jjwt")
 	runtimeOnly("com.h2database:h2")
 	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")
