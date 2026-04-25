@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -53,8 +54,8 @@ public class RaceService implements SaveRaceUseCase, GetRacesUseCase, GetRaceUse
 
     @Override
     @Transactional(readOnly = true)
-    public Race getRace(Integer externalId) {
-        return raceRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new NoSuchElementException("Race not found: " + externalId));
+    public Race getRace(UUID id) {
+        return raceRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Race not found: " + id));
     }
 }

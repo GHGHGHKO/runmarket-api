@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -52,6 +53,11 @@ public class RacePersistenceAdapter implements RaceRepository {
         return raceJpaRepository.findAll().stream()
                 .map(raceMapper::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Optional<Race> findById(UUID id) {
+        return raceJpaRepository.findById(id).map(raceMapper::toDomain);
     }
 
     @Override

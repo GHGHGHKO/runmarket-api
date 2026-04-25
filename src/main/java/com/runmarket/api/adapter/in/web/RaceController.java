@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/races")
@@ -23,13 +24,13 @@ public class RaceController {
     private final GetRacesUseCase getRacesUseCase;
     private final GetRaceUseCase getRaceUseCase;
 
-    @PutMapping("/{id}")
+    @PutMapping("/{externalId}")
     public ResponseEntity<RaceDetailResponse> saveRace(
-            @PathVariable Integer id,
+            @PathVariable Integer externalId,
             @Valid @RequestBody SaveRaceRequest request
     ) {
         SaveRaceCommand command = new SaveRaceCommand(
-                id,
+                externalId,
                 request.name(),
                 request.courses(),
                 request.date(),
@@ -59,7 +60,7 @@ public class RaceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<RaceDetailResponse> getRace(@PathVariable Integer id) {
+    public ResponseEntity<RaceDetailResponse> getRace(@PathVariable UUID id) {
         return ResponseEntity.ok(RaceDetailResponse.from(getRaceUseCase.getRace(id)));
     }
 }

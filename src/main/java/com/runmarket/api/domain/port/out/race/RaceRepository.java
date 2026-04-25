@@ -4,9 +4,11 @@ import com.runmarket.api.domain.model.Race;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface RaceRepository {
     Race save(Race race);
     List<Race> findAll();
+    Optional<Race> findById(UUID id);
     Optional<Race> findByExternalId(Integer externalId);
 }
