@@ -1,0 +1,28 @@
+CREATE TABLE races
+(
+    id                      UUID         NOT NULL,
+    external_id             INTEGER      NOT NULL,
+    name                    VARCHAR(255) NOT NULL,
+    courses                 VARCHAR(500),
+    date                    DATE         NOT NULL,
+    start_time              VARCHAR(10),
+    venue                   VARCHAR(255),
+    venue_address           VARCHAR(500),
+    region                  VARCHAR(100),
+    organizer               VARCHAR(255),
+    representative          VARCHAR(100),
+    phone                   VARCHAR(50),
+    email                   VARCHAR(255),
+    registration_start_date DATE,
+    registration_end_date   DATE,
+    homepage_url            VARCHAR(500),
+    lat                     DOUBLE PRECISION,
+    lng                     DOUBLE PRECISION,
+    description             TEXT,
+    created_by              VARCHAR(255) NOT NULL,
+    created_at              TIMESTAMP    NOT NULL,
+    updated_by              VARCHAR(255) NOT NULL,
+    updated_at              TIMESTAMP    NOT NULL,
+    CONSTRAINT pk_races PRIMARY KEY (id),
+    CONSTRAINT uq_races_external_id UNIQUE (external_id)
+);
