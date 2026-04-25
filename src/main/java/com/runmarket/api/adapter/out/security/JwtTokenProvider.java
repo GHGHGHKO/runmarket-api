@@ -42,8 +42,7 @@ public class JwtTokenProvider implements TokenProvider {
                 Instant.ofEpochMilli(expiry.getTime()), ZoneId.systemDefault());
 
         String token = Jwts.builder()
-                .subject(user.getId().toString())
-                .claim("email", user.getEmail())
+                .subject(user.getEmail())
                 .claim("roles", roles)
                 .issuedAt(now)
                 .expiration(expiry)
