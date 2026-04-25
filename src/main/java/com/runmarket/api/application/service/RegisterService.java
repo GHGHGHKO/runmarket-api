@@ -1,5 +1,6 @@
 package com.runmarket.api.application.service;
 
+import com.runmarket.api.domain.event.EmailVerificationEvent;
 import com.runmarket.api.domain.exception.EmailAlreadyExistsException;
 import com.runmarket.api.domain.exception.InvalidVerificationTokenException;
 import com.runmarket.api.domain.model.AuthProvider;
@@ -10,11 +11,11 @@ import com.runmarket.api.domain.model.User;
 import com.runmarket.api.domain.port.in.auth.RegisterCommand;
 import com.runmarket.api.domain.port.in.auth.RegisterUseCase;
 import com.runmarket.api.domain.port.in.auth.VerifyEmailUseCase;
-import com.runmarket.api.domain.port.out.email.EmailPort;
 import com.runmarket.api.domain.port.out.user.EmailVerificationTokenRepository;
 import com.runmarket.api.domain.port.out.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +30,7 @@ public class RegisterService implements RegisterUseCase, VerifyEmailUseCase {
 
     private final UserRepository userRepository;
     private final EmailVerificationTokenRepository tokenRepository;
-    private final EmailPort emailPort;
+    private final ApplicationEventPublisher eventPublisher;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${app.base-url}")
@@ -64,7 +65,7 @@ public class RegisterService implements RegisterUseCase, VerifyEmailUseCase {
                 .build());
 
         String verificationLink = baseUrl + "/verify?token=" + rawToken;
-        emailPort.sendVerificationEmail(command.email(), verificationLink);
+        eventPublisher.publishEvent(new EmailVerificationEvent(command.email(), verificationLink));
     }
 
     @Override
