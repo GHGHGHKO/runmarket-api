@@ -2,6 +2,7 @@ plugins {
 	java
 	id("org.springframework.boot") version "4.1.0-M4"
 	id("io.spring.dependency-management") version "1.1.7"
+	id("com.google.cloud.tools.jib") version "3.5.3"
 }
 
 group = "com.runmarket"
@@ -20,6 +21,7 @@ repositories {
 val jjwt = "0.13.0"
 
 dependencies {
+	implementation("org.flywaydb:flyway-database-postgresql")
 	implementation("org.springframework.boot:spring-boot-h2console")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -53,4 +55,14 @@ dependencies {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+jib {
+	from {
+		image = "eclipse-temurin:25-jre-alpine"
+	}
+	to {
+		image = "gudrb963/runmarket-api"
+		tags = setOf("latest")
+	}
 }
