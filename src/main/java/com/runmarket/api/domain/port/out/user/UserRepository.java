@@ -11,4 +11,5 @@ public interface UserRepository {
     Optional<User> findByEmail(String email);
     Optional<User> findByProviderAndProviderId(AuthProvider provider, String providerId);
     User save(User user);
+    void updateVerified(UUID userId);
 }

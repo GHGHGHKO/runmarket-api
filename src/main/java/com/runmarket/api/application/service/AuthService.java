@@ -1,5 +1,6 @@
 package com.runmarket.api.application.service;
 
+import com.runmarket.api.domain.exception.UserNotVerifiedException;
 import com.runmarket.api.domain.model.User;
 import com.runmarket.api.domain.port.in.auth.AuthToken;
 import com.runmarket.api.domain.port.in.auth.LoginCommand;
@@ -26,6 +27,10 @@ public class AuthService implements LoginUseCase {
 
         if (!passwordEncoder.matches(command.password(), user.getPassword())) {
             throw new BadCredentialsException("Invalid credentials");
+        }
+
+        if (!user.isVerified()) {
+            throw new UserNotVerifiedException();
         }
 
         return tokenProvider.generateToken(user);

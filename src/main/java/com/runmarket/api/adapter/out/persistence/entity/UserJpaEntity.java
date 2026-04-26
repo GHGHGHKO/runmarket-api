@@ -28,4 +28,11 @@ public class UserJpaEntity extends BaseEntity {
     private AuthProvider provider;
 
     private String providerId;
+
+    @Column(nullable = false)
+    private boolean verified;
+
+    public void verify() {
+        this.verified = true;
+    }
 }
