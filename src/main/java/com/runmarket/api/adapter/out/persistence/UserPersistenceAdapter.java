@@ -3,9 +3,9 @@ package com.runmarket.api.adapter.out.persistence;
 import com.runmarket.api.adapter.out.persistence.entity.RoleJpaEntity;
 import com.runmarket.api.adapter.out.persistence.entity.UserJpaEntity;
 import com.runmarket.api.adapter.out.persistence.mapper.UserMapper;
+import com.runmarket.api.adapter.out.persistence.repository.EmailVerificationTokenJpaRepository;
 import com.runmarket.api.adapter.out.persistence.repository.RoleJpaRepository;
 import com.runmarket.api.adapter.out.persistence.repository.UserJpaRepository;
-import com.runmarket.api.domain.model.AuthProvider;
 import com.runmarket.api.domain.model.Role;
 import com.runmarket.api.domain.model.User;
 import com.runmarket.api.domain.port.out.user.UserRepository;
@@ -23,26 +23,13 @@ public class UserPersistenceAdapter implements UserRepository {
 
     private final UserJpaRepository userJpaRepository;
     private final RoleJpaRepository roleJpaRepository;
+    private final EmailVerificationTokenJpaRepository tokenJpaRepository;
     private final UserMapper userMapper;
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<User> findById(UUID id) {
-        return userJpaRepository.findById(id)
-                .map(this::toUserWithRoles);
-    }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<User> findByEmail(String email) {
         return userJpaRepository.findByEmail(email)
-                .map(this::toUserWithRoles);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<User> findByProviderAndProviderId(AuthProvider provider, String providerId) {
-        return userJpaRepository.findByProviderAndProviderId(provider, providerId)
                 .map(this::toUserWithRoles);
     }
 
@@ -67,6 +54,14 @@ public class UserPersistenceAdapter implements UserRepository {
     @Transactional
     public void updateVerified(UUID userId) {
         userJpaRepository.findById(userId).ifPresent(UserJpaEntity::verify);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(UUID userId) {
+        tokenJpaRepository.deleteByUserId(userId);
+        roleJpaRepository.deleteAllByUserId(userId);
+        userJpaRepository.deleteById(userId);
     }
 
     private User toUserWithRoles(UserJpaEntity entity) {
