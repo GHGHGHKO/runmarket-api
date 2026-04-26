@@ -63,6 +63,6 @@ jib {
 	}
 	to {
 		image = "gudrb963/runmarket-api"
-		tags = setOf("latest")
+		tags = setOf("local")
 	}
 }
