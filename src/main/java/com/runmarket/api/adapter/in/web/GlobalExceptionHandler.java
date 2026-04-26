@@ -53,7 +53,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ProblemDetail> handleUnauthorized(Exception e) {
         log.warn("Authentication failed: user={}, message={}", SecurityUtils.currentUserEmail(), e.getMessage());
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
-                HttpStatus.UNAUTHORIZED, "Invalid email or password");
+                HttpStatus.UNAUTHORIZED, "이메일 또는 비밀번호가 올바르지 않습니다.");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
     }
 
@@ -66,7 +66,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
 
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
-                HttpStatus.BAD_REQUEST, "Validation failed");
+                HttpStatus.BAD_REQUEST, "입력값이 올바르지 않습니다.");
         problem.setProperty("fieldErrors", fieldErrors);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
@@ -83,7 +83,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ProblemDetail> handleException(Exception e) {
         log.error("Unexpected error: user={}, message={}", SecurityUtils.currentUserEmail(), e.getMessage(), e);
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
-                HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+                HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
     }
 
