@@ -16,9 +16,10 @@ public record RaceListItemResponse(
         String region,
         String organizer,
         String phone,
-        RegistrationStatus registrationStatus
+        RegistrationStatus registrationStatus,
+        long likeCount
 ) {
-    public static RaceListItemResponse from(Race race) {
+    public static RaceListItemResponse from(Race race, long likeCount) {
         return new RaceListItemResponse(
                 race.getId(),
                 race.getName(),
@@ -28,7 +29,8 @@ public record RaceListItemResponse(
                 race.getRegion(),
                 race.getOrganizer(),
                 race.getPhone(),
-                race.getRegistrationStatus()
+                race.getRegistrationStatus(),
+                likeCount
         );
     }
 }

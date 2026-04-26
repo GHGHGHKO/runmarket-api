@@ -11,4 +11,5 @@ public interface RaceRepository {
     List<Race> findAll();
     Optional<Race> findById(UUID id);
     Optional<Race> findByExternalId(Integer externalId);
+    List<Race> findAllByIds(List<UUID> ids);
 }

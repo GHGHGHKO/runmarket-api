@@ -64,4 +64,11 @@ public class RacePersistenceAdapter implements RaceRepository {
     public Optional<Race> findByExternalId(Integer externalId) {
         return raceJpaRepository.findByExternalId(externalId).map(raceMapper::toDomain);
     }
+
+    @Override
+    public List<Race> findAllByIds(List<UUID> ids) {
+        return raceJpaRepository.findAllById(ids).stream()
+                .map(raceMapper::toDomain)
+                .toList();
+    }
 }
