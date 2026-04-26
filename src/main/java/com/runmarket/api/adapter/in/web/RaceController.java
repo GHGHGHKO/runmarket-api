@@ -1,6 +1,7 @@
 package com.runmarket.api.adapter.in.web;
 
 import com.runmarket.api.adapter.in.web.dto.RaceDetailResponse;
+import com.runmarket.api.adapter.in.web.dto.RaceLikeResponse;
 import com.runmarket.api.adapter.in.web.dto.RaceListItemResponse;
 import com.runmarket.api.adapter.in.web.dto.SaveRaceRequest;
 import com.runmarket.api.common.SecurityUtils;
@@ -94,14 +95,18 @@ public class RaceController {
     }
 
     @PostMapping("/{id}/like")
-    public ResponseEntity<Void> likeRace(@PathVariable UUID id) {
-        likeRaceUseCase.like(id, SecurityUtils.currentUserEmail());
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<RaceLikeResponse> likeRace(@PathVariable UUID id) {
+        String userEmail = SecurityUtils.currentUserEmail();
+        likeRaceUseCase.like(id, userEmail);
+        long likeCount = getRaceLikeCountUseCase.getLikeCount(id);
+        return ResponseEntity.ok(new RaceLikeResponse(likeCount, true));
     }
 
     @DeleteMapping("/{id}/like")
-    public ResponseEntity<Void> unlikeRace(@PathVariable UUID id) {
-        unlikeRaceUseCase.unlike(id, SecurityUtils.currentUserEmail());
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<RaceLikeResponse> unlikeRace(@PathVariable UUID id) {
+        String userEmail = SecurityUtils.currentUserEmail();
+        unlikeRaceUseCase.unlike(id, userEmail);
+        long likeCount = getRaceLikeCountUseCase.getLikeCount(id);
+        return ResponseEntity.ok(new RaceLikeResponse(likeCount, false));
     }
 }
