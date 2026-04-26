@@ -17,6 +17,7 @@ public class User {
     private AuthProvider provider;
     private String providerId;
     private List<Role> roles;
+    private boolean verified;
     private String createdBy;
     private LocalDateTime createdAt;
     private String updatedBy;

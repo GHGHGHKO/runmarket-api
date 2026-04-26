@@ -6,6 +6,7 @@ import com.runmarket.api.adapter.out.persistence.mapper.UserMapper;
 import com.runmarket.api.adapter.out.persistence.repository.RoleJpaRepository;
 import com.runmarket.api.adapter.out.persistence.repository.UserJpaRepository;
 import com.runmarket.api.domain.model.AuthProvider;
+import com.runmarket.api.domain.model.Role;
 import com.runmarket.api.domain.model.User;
 import com.runmarket.api.domain.port.out.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -50,9 +51,22 @@ public class UserPersistenceAdapter implements UserRepository {
     public User save(User user) {
         UserJpaEntity savedUser = userJpaRepository.save(userMapper.toJpaEntity(user));
         List<RoleJpaEntity> savedRoles = user.getRoles().stream()
-                .map(role -> roleJpaRepository.save(userMapper.toRoleJpaEntity(role)))
+                .map(role -> {
+                    Role roleWithUserId = Role.builder()
+                            .id(role.getId())
+                            .userId(savedUser.getId())
+                            .roleType(role.getRoleType())
+                            .build();
+                    return roleJpaRepository.save(userMapper.toRoleJpaEntity(roleWithUserId));
+                })
                 .toList();
         return userMapper.toDomain(savedUser, savedRoles);
+    }
+
+    @Override
+    @Transactional
+    public void updateVerified(UUID userId) {
+        userJpaRepository.findById(userId).ifPresent(UserJpaEntity::verify);
     }
 
     private User toUserWithRoles(UserJpaEntity entity) {

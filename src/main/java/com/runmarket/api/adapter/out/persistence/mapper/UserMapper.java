@@ -20,6 +20,7 @@ public class UserMapper {
                 .provider(entity.getProvider())
                 .providerId(entity.getProviderId())
                 .roles(roles.stream().map(this::toRoleDomain).toList())
+                .verified(entity.isVerified())
                 .createdBy(entity.getCreatedBy())
                 .createdAt(entity.getCreatedAt())
                 .updatedBy(entity.getUpdatedBy())
@@ -34,6 +35,7 @@ public class UserMapper {
                 .nickname(user.getNickname())
                 .provider(user.getProvider())
                 .providerId(user.getProviderId())
+                .verified(user.isVerified())
                 .build();
     }
 
