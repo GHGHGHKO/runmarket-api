@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.runmarket.api.common.SecurityUtils;
+
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -28,24 +30,28 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ProblemDetail> handleEmailAlreadyExists(EmailAlreadyExistsException e) {
+        log.warn("Email already exists: user={}, message={}", SecurityUtils.currentUserEmail(), e.getMessage());
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
     }
 
     @ExceptionHandler(InvalidVerificationTokenException.class)
     public ResponseEntity<ProblemDetail> handleInvalidToken(InvalidVerificationTokenException e) {
+        log.warn("Invalid verification token: user={}, message={}", SecurityUtils.currentUserEmail(), e.getMessage());
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
 
     @ExceptionHandler(UserNotVerifiedException.class)
     public ResponseEntity<ProblemDetail> handleUserNotVerified(UserNotVerifiedException e) {
+        log.warn("User not verified: user={}, message={}", SecurityUtils.currentUserEmail(), e.getMessage());
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problem);
     }
 
     @ExceptionHandler({BadCredentialsException.class, UsernameNotFoundException.class})
-    public ResponseEntity<ProblemDetail> handleUnauthorized() {
+    public ResponseEntity<ProblemDetail> handleUnauthorized(Exception e) {
+        log.warn("Authentication failed: user={}, message={}", SecurityUtils.currentUserEmail(), e.getMessage());
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
                 HttpStatus.UNAUTHORIZED, "Invalid email or password");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
@@ -66,17 +72,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
 
-    @ExceptionHandler(java.util.NoSuchElementException.class)
+    @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ProblemDetail> handleNotFound(NoSuchElementException e) {
+        log.warn("Resource not found: user={}, message={}", SecurityUtils.currentUserEmail(), e.getMessage());
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problem);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleException(Exception e) {
+        log.error("Unexpected error: user={}, message={}", SecurityUtils.currentUserEmail(), e.getMessage(), e);
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
-        log.error("{}", e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
     }
+
 }

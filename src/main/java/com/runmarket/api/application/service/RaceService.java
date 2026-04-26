@@ -6,7 +6,9 @@ import com.runmarket.api.domain.port.in.race.GetRacesUseCase;
 import com.runmarket.api.domain.port.in.race.SaveRaceCommand;
 import com.runmarket.api.domain.port.in.race.SaveRaceUseCase;
 import com.runmarket.api.domain.port.out.race.RaceRepository;
+import com.runmarket.api.common.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -43,7 +46,9 @@ public class RaceService implements SaveRaceUseCase, GetRacesUseCase, GetRaceUse
                 .lng(command.lng())
                 .description(command.description())
                 .build();
-        return raceRepository.save(race);
+        Race saved = raceRepository.save(race);
+        log.info("Race saved: id={}, name={}, by={}", saved.getId(), saved.getName(), SecurityUtils.currentUserEmail());
+        return saved;
     }
 
     @Override

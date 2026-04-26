@@ -14,6 +14,7 @@ import com.runmarket.api.domain.port.in.auth.VerifyEmailUseCase;
 import com.runmarket.api.domain.port.out.user.EmailVerificationTokenRepository;
 import com.runmarket.api.domain.port.out.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RegisterService implements RegisterUseCase, VerifyEmailUseCase {
@@ -66,6 +68,7 @@ public class RegisterService implements RegisterUseCase, VerifyEmailUseCase {
 
         String verificationLink = baseUrl + "/verify?token=" + rawToken;
         eventPublisher.publishEvent(new EmailVerificationEvent(command.email(), verificationLink));
+        log.info("User registered: email={}", command.email());
     }
 
     @Override
@@ -80,5 +83,6 @@ public class RegisterService implements RegisterUseCase, VerifyEmailUseCase {
 
         userRepository.updateVerified(verificationToken.getUserId());
         tokenRepository.deleteByUserId(verificationToken.getUserId());
+        log.info("Email verified: userId={}", verificationToken.getUserId());
     }
 }
