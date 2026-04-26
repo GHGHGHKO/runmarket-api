@@ -7,8 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -57,5 +59,13 @@ public class RaceLikePersistenceAdapter implements RaceLikeRepository {
             result.put((UUID) row[0], (Long) row[1]);
         }
         return result;
+    }
+
+    @Override
+    public Set<UUID> findLikedRaceIds(UUID userId, List<UUID> raceIds) {
+        if (raceIds.isEmpty()) {
+            return Set.of();
+        }
+        return new HashSet<>(raceLikeJpaRepository.findRaceIdsByUserIdAndRaceIdIn(userId, raceIds));
     }
 }

@@ -34,8 +34,9 @@ public class UserController {
         List<Race> races = getLikedRacesUseCase.getLikedRaces(SecurityUtils.currentUserEmail());
         List<UUID> raceIds = races.stream().map(Race::getId).toList();
         Map<UUID, Long> likeCounts = getRaceLikeCountUseCase.getLikeCounts(raceIds);
+        // 마이페이지 좋아요 목록은 항상 isLiked = true
         return ResponseEntity.ok(races.stream()
-                .map(race -> RaceListItemResponse.from(race, likeCounts.getOrDefault(race.getId(), 0L)))
+                .map(race -> RaceListItemResponse.from(race, likeCounts.getOrDefault(race.getId(), 0L), true))
                 .toList());
     }
 }

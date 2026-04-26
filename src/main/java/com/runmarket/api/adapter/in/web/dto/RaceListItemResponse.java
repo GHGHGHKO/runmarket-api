@@ -17,9 +17,10 @@ public record RaceListItemResponse(
         String organizer,
         String phone,
         RegistrationStatus registrationStatus,
-        long likeCount
+        long likeCount,
+        boolean isLiked
 ) {
-    public static RaceListItemResponse from(Race race, long likeCount) {
+    public static RaceListItemResponse from(Race race, long likeCount, boolean isLiked) {
         return new RaceListItemResponse(
                 race.getId(),
                 race.getName(),
@@ -30,7 +31,8 @@ public record RaceListItemResponse(
                 race.getOrganizer(),
                 race.getPhone(),
                 race.getRegistrationStatus(),
-                likeCount
+                likeCount,
+                isLiked
         );
     }
 }

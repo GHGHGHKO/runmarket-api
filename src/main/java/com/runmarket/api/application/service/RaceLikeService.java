@@ -4,6 +4,7 @@ import com.runmarket.api.domain.model.Race;
 import com.runmarket.api.domain.model.User;
 import com.runmarket.api.domain.port.in.race.GetLikedRacesUseCase;
 import com.runmarket.api.domain.port.in.race.GetRaceLikeCountUseCase;
+import com.runmarket.api.domain.port.in.race.GetRaceLikeStatusUseCase;
 import com.runmarket.api.domain.port.in.race.LikeRaceUseCase;
 import com.runmarket.api.domain.port.in.race.UnlikeRaceUseCase;
 import com.runmarket.api.domain.port.out.race.RaceLikeRepository;
@@ -17,13 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class RaceLikeService implements LikeRaceUseCase, UnlikeRaceUseCase, GetLikedRacesUseCase, GetRaceLikeCountUseCase {
+public class RaceLikeService implements LikeRaceUseCase, UnlikeRaceUseCase, GetLikedRacesUseCase, GetRaceLikeCountUseCase, GetRaceLikeStatusUseCase {
 
     private final RaceLikeRepository raceLikeRepository;
     private final RaceRepository raceRepository;
@@ -72,8 +74,34 @@ public class RaceLikeService implements LikeRaceUseCase, UnlikeRaceUseCase, GetL
         return raceLikeRepository.countByRaceIds(raceIds);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isLiked(UUID raceId, String userEmail) {
+        if (isAnonymous(userEmail)) {
+            return false;
+        }
+        return userRepository.findByEmail(userEmail)
+                .map(user -> raceLikeRepository.existsByUserIdAndRaceId(user.getId(), raceId))
+                .orElse(false);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Set<UUID> getLikedRaceIds(List<UUID> raceIds, String userEmail) {
+        if (isAnonymous(userEmail) || raceIds.isEmpty()) {
+            return Set.of();
+        }
+        return userRepository.findByEmail(userEmail)
+                .map(user -> raceLikeRepository.findLikedRaceIds(user.getId(), raceIds))
+                .orElse(Set.of());
+    }
+
     private User getUser(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+    }
+
+    private boolean isAnonymous(String userEmail) {
+        return "anonymous".equals(userEmail);
     }
 }

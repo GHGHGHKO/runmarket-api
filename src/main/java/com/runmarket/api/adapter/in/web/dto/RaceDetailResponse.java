@@ -27,9 +27,10 @@ public record RaceDetailResponse(
         Double lat,
         Double lng,
         String description,
-        long likeCount
+        long likeCount,
+        boolean isLiked
 ) {
-    public static RaceDetailResponse from(Race race, long likeCount) {
+    public static RaceDetailResponse from(Race race, long likeCount, boolean isLiked) {
         return new RaceDetailResponse(
                 race.getId(),
                 race.getName(),
@@ -50,7 +51,8 @@ public record RaceDetailResponse(
                 race.getLat(),
                 race.getLng(),
                 race.getDescription(),
-                likeCount
+                likeCount,
+                isLiked
         );
     }
 }

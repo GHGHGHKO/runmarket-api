@@ -21,4 +21,7 @@ public interface RaceLikeJpaRepository extends JpaRepository<RaceLikeJpaEntity, 
 
     @Query("SELECT rl.raceId, COUNT(rl) FROM RaceLikeJpaEntity rl WHERE rl.raceId IN :raceIds GROUP BY rl.raceId")
     List<Object[]> countGroupByRaceIdIn(@Param("raceIds") List<UUID> raceIds);
+
+    @Query("SELECT rl.raceId FROM RaceLikeJpaEntity rl WHERE rl.userId = :userId AND rl.raceId IN :raceIds")
+    List<UUID> findRaceIdsByUserIdAndRaceIdIn(@Param("userId") UUID userId, @Param("raceIds") List<UUID> raceIds);
 }
