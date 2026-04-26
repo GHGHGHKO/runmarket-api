@@ -5,9 +5,10 @@ import com.runmarket.api.domain.model.RegistrationStatus;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public record RaceListItemResponse(
-        Integer id,
+        UUID id,
         String name,
         List<String> courses,
         LocalDate date,
@@ -19,7 +20,7 @@ public record RaceListItemResponse(
 ) {
     public static RaceListItemResponse from(Race race) {
         return new RaceListItemResponse(
-                race.getExternalId(),
+                race.getId(),
                 race.getName(),
                 race.getCourses(),
                 race.getDate(),
