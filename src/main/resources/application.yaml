@@ -17,6 +17,9 @@ jwt:
   secret: ${JWT_SECRET}
   expiration: 60000
 
+turnstile:
+  secret-key: ${TURNSTILE_SECRET_KEY}
+
 app:
   base-url: https://www.runmarket.cc
   mail:

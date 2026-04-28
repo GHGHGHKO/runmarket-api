@@ -2,6 +2,7 @@ package com.runmarket.api.adapter.in.web;
 
 import com.runmarket.api.domain.exception.EmailAlreadyExistsException;
 import com.runmarket.api.domain.exception.InvalidVerificationTokenException;
+import com.runmarket.api.domain.exception.TurnstileVerificationException;
 import com.runmarket.api.domain.exception.UserNotVerifiedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -47,6 +48,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.warn("User not verified: user={}, message={}", SecurityUtils.currentUserEmail(), e.getMessage());
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problem);
+    }
+
+    @ExceptionHandler(TurnstileVerificationException.class)
+    public ResponseEntity<ProblemDetail> handleTurnstileVerification(TurnstileVerificationException e) {
+        log.warn("Turnstile verification failed: user={}", SecurityUtils.currentUserEmail());
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problem);
     }
 
     @ExceptionHandler({BadCredentialsException.class, UsernameNotFoundException.class})

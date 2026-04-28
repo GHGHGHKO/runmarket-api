@@ -6,6 +6,7 @@ import com.runmarket.api.adapter.in.web.dto.RegisterResponse;
 import com.runmarket.api.adapter.in.web.dto.TokenResponse;
 import com.runmarket.api.adapter.in.web.dto.VerifyEmailRequest;
 import com.runmarket.api.adapter.in.web.mapper.TokenResponseMapper;
+import com.runmarket.api.adapter.out.turnstile.TurnstileService;
 import com.runmarket.api.domain.port.in.auth.AuthToken;
 import com.runmarket.api.domain.port.in.auth.LoginCommand;
 import com.runmarket.api.domain.port.in.auth.LoginUseCase;
@@ -31,15 +32,18 @@ public class AuthController {
     private final RegisterUseCase registerUseCase;
     private final VerifyEmailUseCase verifyEmailUseCase;
     private final TokenResponseMapper tokenResponseMapper;
+    private final TurnstileService turnstileService;
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
+        turnstileService.verify(request.turnstileToken());
         AuthToken authToken = loginUseCase.login(new LoginCommand(request.email(), request.password()));
         return ResponseEntity.ok(tokenResponseMapper.toResponse(authToken));
     }
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
+        turnstileService.verify(request.turnstileToken());
         registerUseCase.register(new RegisterCommand(request.email(), request.password()));
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(new RegisterResponse("인증 이메일을 발송했습니다. 이메일을 확인하여 회원가입을 완료해주세요."));
