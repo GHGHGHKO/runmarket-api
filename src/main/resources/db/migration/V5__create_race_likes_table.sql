@@ -13,4 +13,3 @@ CREATE TABLE race_likes
     CONSTRAINT fk_race_likes_race FOREIGN KEY (race_id) REFERENCES races (id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_race_likes_race_id ON race_likes (race_id);
