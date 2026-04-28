@@ -9,6 +9,8 @@ import com.runmarket.api.domain.port.out.race.RaceRepository;
 import com.runmarket.api.common.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ public class RaceService implements SaveRaceUseCase, GetRacesUseCase, GetRaceUse
     private final RaceRepository raceRepository;
 
     @Override
+    @CacheEvict(cacheNames = "races", allEntries = true)
     public Race save(SaveRaceCommand command) {
         Race race = Race.builder()
                 .externalId(command.externalId())
@@ -52,6 +55,7 @@ public class RaceService implements SaveRaceUseCase, GetRacesUseCase, GetRaceUse
     }
 
     @Override
+    @Cacheable("races")
     @Transactional(readOnly = true)
     public List<Race> getRaces() {
         return raceRepository.findAll();
