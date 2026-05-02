@@ -1,69 +1,50 @@
+import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
+
 plugins {
-	java
-	id("org.springframework.boot") version "4.1.0-M4"
-	id("io.spring.dependency-management") version "1.1.7"
-	id("com.google.cloud.tools.jib") version "3.5.3"
+    java
+    id("org.springframework.boot") version "4.1.0-M4" apply false
+    id("io.spring.dependency-management") version "1.1.7" apply false
+    id("com.google.cloud.tools.jib") version "3.5.3" apply false
 }
 
 group = "com.runmarket"
 version = "0.0.1-SNAPSHOT"
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(25)
-	}
+allprojects {
+    repositories {
+        mavenCentral()
+        maven { url = uri("https://repo.spring.io/milestone") }
+    }
 }
 
-repositories {
-	mavenCentral()
-}
+subprojects {
+    apply(plugin = "java")
+    apply(plugin = "io.spring.dependency-management")
 
-val jjwt = "0.13.0"
+    the<DependencyManagementExtension>().apply {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:4.1.0-M4") {
+                bomProperty("lombok.version", "1.18.38")
+            }
+        }
+    }
 
-dependencies {
-	implementation("org.flywaydb:flyway-database-postgresql")
-	implementation("org.springframework.boot:spring-boot-h2console")
-	implementation("org.springframework.boot:spring-boot-starter-actuator")
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.springframework.boot:spring-boot-starter-flyway")
-	implementation("org.springframework.boot:spring-boot-starter-security")
-	implementation("org.springframework.boot:spring-boot-starter-security-oauth2-client")
-	implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
-	implementation("org.springframework.boot:spring-boot-starter-validation")
-	implementation("org.springframework.boot:spring-boot-starter-mail")
-	implementation("org.springframework.boot:spring-boot-starter-cache")
-	implementation("org.springframework.boot:spring-boot-starter-webmvc")
-	implementation("io.jsonwebtoken:jjwt-api:$jjwt")
-	compileOnly("org.projectlombok:lombok")
-	runtimeOnly("io.jsonwebtoken:jjwt-impl:$jjwt")
-	runtimeOnly("io.jsonwebtoken:jjwt-jackson:$jjwt")
-	runtimeOnly("com.h2database:h2")
-	runtimeOnly("org.postgresql:postgresql")
-	annotationProcessor("org.projectlombok:lombok")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-flyway-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-security-oauth2-client-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-security-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-	testCompileOnly("org.projectlombok:lombok")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-	testAnnotationProcessor("org.projectlombok:lombok")
-}
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(25)
+        }
+    }
 
-tasks.withType<Test> {
-	useJUnitPlatform()
-}
+    dependencies {
+        "compileOnly"("org.projectlombok:lombok")
+        "annotationProcessor"("org.projectlombok:lombok")
+        "testCompileOnly"("org.projectlombok:lombok")
+        "testAnnotationProcessor"("org.projectlombok:lombok")
+        "testImplementation"("org.springframework.boot:spring-boot-starter-test")
+        "testRuntimeOnly"("org.junit.platform:junit-platform-launcher")
+    }
 
-jib {
-	from {
-		image = "eclipse-temurin:25-jre-alpine"
-	}
-	to {
-		image = "gudrb963/runmarket-api"
-		tags = setOf("local")
-	}
+    tasks.withType<Test> {
+        useJUnitPlatform()
+    }
 }
