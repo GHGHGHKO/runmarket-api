@@ -1,6 +1,17 @@
 plugins {
     java
     id("org.springframework.boot")
+    id("com.google.cloud.tools.jib")
+}
+
+jib {
+    from {
+        image = "eclipse-temurin:25-jre-alpine"
+    }
+    to {
+        image = "gudrb963/runmarket-pacer"
+        tags = setOf("latest")
+    }
 }
 
 val jjwt = "0.13.0"
