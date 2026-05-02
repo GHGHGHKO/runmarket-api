@@ -19,6 +19,7 @@ val jjwt = "0.13.0"
 dependencies {
     implementation(project(":application"))
 
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
