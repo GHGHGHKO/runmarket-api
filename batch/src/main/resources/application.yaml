@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: batch
+  batch:
+    job:
+      enabled: false
+  cache:
+    type: none
+  jpa:
+    open-in-view: false
+
+marathon-race:
+  request-delay-ms: 500
+  timeout-ms: 15000
+  url: {MARATHON_RACE_URL}
