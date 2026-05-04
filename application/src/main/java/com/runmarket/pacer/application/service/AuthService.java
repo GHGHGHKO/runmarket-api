@@ -11,10 +11,12 @@ import com.runmarket.pacer.domain.port.out.security.PasswordHashPort;
 import com.runmarket.pacer.domain.port.out.user.UserRepository;
 import com.runmarket.pacer.domain.port.out.verification.CaptchaVerificationPort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnWebApplication
 public class AuthService implements LoginUseCase {
 
     private final UserRepository userRepository;

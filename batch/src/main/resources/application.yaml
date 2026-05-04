@@ -1,6 +1,8 @@
 spring:
   application:
     name: batch
+  main:
+    web-application-type: none
   batch:
     job:
       enabled: false
@@ -8,8 +10,29 @@ spring:
     type: none
   jpa:
     open-in-view: false
+  mail:
+    host: live.smtp.mailtrap.io
+    port: 587
+    username: api
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+app:
+  mail:
+    from: noreply@mail.runmarket.cc
+  admin:
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}
 
 marathon-race:
   request-delay-ms: 500
   timeout-ms: 15000
   url: {MARATHON_RACE_URL}
+
+turnstile:
+  secret-key: ${TURNSTILE_SECRET_KEY}
