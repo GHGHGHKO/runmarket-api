@@ -15,12 +15,15 @@ jib {
 }
 
 val jsoup = "1.18.3"
+val jackson = "2.21.3"
 
 dependencies {
     implementation(project(":application"))
-    runtimeOnly(project(":infrastructure"))
-    runtimeOnly(project(":event-bus"))
 
     implementation("org.springframework.boot:spring-boot-starter-batch")
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jackson")
     implementation("org.jsoup:jsoup:$jsoup")
+
+    runtimeOnly(project(":infrastructure"))
+    runtimeOnly(project(":event-bus"))
 }

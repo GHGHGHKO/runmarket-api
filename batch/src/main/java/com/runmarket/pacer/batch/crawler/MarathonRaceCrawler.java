@@ -36,9 +36,6 @@ public class MarathonRaceCrawler {
     private static final Pattern HM_PATTERN = Pattern.compile("(\\d{2}):(\\d{2})");
     private static final Pattern URL_PATTERN = Pattern.compile("https?://\\S+");
 
-    @Value("${marathon-race.request-delay-ms:500}")
-    private long requestDelayMs;
-
     @Value("${marathon-race.timeout-ms:15000}")
     private int timeoutMs;
 
@@ -66,7 +63,6 @@ public class MarathonRaceCrawler {
                 int before = all.size();
                 while (m.find()) all.add(Integer.parseInt(m.group(1)));
                 log.info("{}년: {}개 수집 (누적 {}개)", year, all.size() - before, all.size());
-                sleep();
             } catch (IOException e) {
                 log.error("{}년 목록 조회 실패: {}", year, e.getMessage());
             }
@@ -77,7 +73,6 @@ public class MarathonRaceCrawler {
     }
 
     public Optional<SaveRaceCommand> fetchRaceDetail(int no) {
-        sleep();
         try {
             Connection.Response response = Jsoup.connect(url + DETAIL_URL)
                     .data("no", String.valueOf(no))
@@ -230,13 +225,5 @@ public class MarathonRaceCrawler {
 
     private String nullIfBlank(String s) {
         return (s == null || s.isBlank()) ? null : s;
-    }
-
-    private void sleep() {
-        try {
-            Thread.sleep(requestDelayMs);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
 }

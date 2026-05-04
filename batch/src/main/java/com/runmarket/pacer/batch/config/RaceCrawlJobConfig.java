@@ -1,5 +1,6 @@
 package com.runmarket.pacer.batch.config;
 
+import com.runmarket.pacer.batch.crawler.CrawlStateStore;
 import com.runmarket.pacer.batch.crawler.MarathonRaceCrawler;
 import com.runmarket.pacer.domain.port.in.race.SaveRaceCommand;
 import com.runmarket.pacer.domain.port.in.race.SaveRaceUseCase;
@@ -16,6 +17,7 @@ import org.springframework.batch.infrastructure.item.ItemWriter;
 import org.springframework.batch.infrastructure.item.support.ListItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.batch.core.configuration.annotation.JobScope;
 
 @Slf4j
 @Configuration
@@ -26,6 +28,8 @@ public class RaceCrawlJobConfig {
 
     private final MarathonRaceCrawler crawler;
     private final SaveRaceUseCase saveRaceUseCase;
+    private final CrawlStateStore stateStore;
+    private final RaceCrawlSkipListener skipListener;
 
     @Bean
     public Job raceCrawlJob(JobRepository jobRepository, Step raceCrawlStep) {
@@ -41,10 +45,15 @@ public class RaceCrawlJobConfig {
                 .reader(raceNoItemReader())
                 .processor(raceDetailItemProcessor())
                 .writer(raceItemWriter())
+                .faultTolerant()
+                .skip(Exception.class)
+                .skipLimit(Integer.MAX_VALUE)
+                .listener(skipListener)
                 .build();
     }
 
     @Bean
+    @JobScope
     public ItemReader<Integer> raceNoItemReader() {
         return new ListItemReader<>(crawler.fetchRaceNos());
     }
@@ -53,8 +62,15 @@ public class RaceCrawlJobConfig {
     public ItemProcessor<Integer, SaveRaceCommand> raceDetailItemProcessor() {
         return no -> {
             var command = crawler.fetchRaceDetail(no);
-            if (command.isEmpty()) log.warn("no={} 상세 정보 파싱 실패, 건너뜁니다", no);
-            return command.orElse(null);
+            if (command.isEmpty()) {
+                log.warn("no={} 상세 정보 파싱 실패, 건너뜁니다", no);
+                return null;
+            }
+            String hash = stateStore.computeHash(command.get());
+            if (stateStore.isUnchanged(no, hash)) {
+                return null;
+            }
+            return command.get();
         };
     }
 
@@ -63,7 +79,9 @@ public class RaceCrawlJobConfig {
         return chunk -> {
             for (SaveRaceCommand command : chunk.getItems()) {
                 saveRaceUseCase.save(command);
+                stateStore.markUpdated(command.externalId(), stateStore.computeHash(command));
             }
+            stateStore.flush();
             log.info("{}건 저장 완료", chunk.getItems().size());
         };
     }

@@ -5,7 +5,7 @@ spring:
     web-application-type: none
   batch:
     job:
-      enabled: false
+      enabled: true
   cache:
     type: none
   jpa:
@@ -30,9 +30,9 @@ app:
     password: ${ADMIN_PASSWORD}
 
 marathon-race:
-  request-delay-ms: 500
   timeout-ms: 15000
-  url: {MARATHON_RACE_URL}
+  url: ${MARATHON_RACE_URL}
+  state-file: crawl_state.json
 
 turnstile:
   secret-key: ${TURNSTILE_SECRET_KEY}
