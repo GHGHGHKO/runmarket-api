@@ -23,8 +23,11 @@ spring:
             enable: true
 
 app:
+  base-url: https://www.runmarket.cc
   mail:
     from: noreply@mail.runmarket.cc
+  verification:
+    token-expiry-minutes: 30
   admin:
     email: ${ADMIN_EMAIL}
     password: ${ADMIN_PASSWORD}

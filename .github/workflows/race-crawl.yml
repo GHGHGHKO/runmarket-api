@@ -1,0 +1,57 @@
+name: Trigger Race Crawl Job
+
+on:
+  schedule:
+    - cron: '0 15 * * *'  # 매일 자정 KST (UTC+9)
+  workflow_dispatch:
+
+jobs:
+  raceCrawlJob:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout IAC
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/iac
+          token: ${{ secrets.IAC_REPO_TOKEN }}
+
+      - name: Check for already running Job
+        run: |
+          ACTIVE=$(kubectl get jobs -n applications \
+            -l app.kubernetes.io/name=race-crawl \
+            -o jsonpath='{.items[?(@.status.active>0)].metadata.name}')
+
+          if [ -n "$ACTIVE" ]; then
+            echo "이미 실행 중인 Job이 있습니다: $ACTIVE"
+            exit 1
+          fi
+
+      - name: Create batch Job
+        run: |
+          JOB_NAME=$(helm template runmarket ./helm/runmarket \
+            --set batch.enabled=true \
+            -s templates/race-crawl-job.yaml \
+            -n applications \
+            | kubectl create -f - -o jsonpath='{.metadata.name}')
+          echo "JOB_NAME=$JOB_NAME" >> $GITHUB_ENV
+
+      - name: Wait for Job completion
+        run: |
+          kubectl wait job/$JOB_NAME \
+            --for=condition=complete \
+            --timeout=30m \
+            -n applications
+
+      - name: Delete Job on success
+        run: kubectl delete job $JOB_NAME -n applications
+
+      - name: Print Job logs
+        if: failure()
+        run: |
+          POD_NAME=$(kubectl get pods -n applications \
+            -l job-name=$JOB_NAME \
+            -o jsonpath='{.items[0].metadata.name}')
+
+          echo "=== Logs for $POD_NAME ==="
+          kubectl logs $POD_NAME -n applications

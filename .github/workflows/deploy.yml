@@ -32,7 +32,7 @@ jobs:
 
       - name: Build and push with Jib
         run: |
-          ./gradlew :web:jib \
+          ./gradlew :web:jib :batch:jib \
             -Djib.to.tags=${{ steps.tag.outputs.TAG }}
 
       - name: Checkout IAC
